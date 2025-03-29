@@ -200,10 +200,6 @@ lambda0 <- exp(log(k0) - a0)
 k1 <- b1 + 1
 lambda1 <- exp(log(k1) - a1)
 
-cat("Recovered from group-specific log-hazard model:\n")
-cat("Control:   k =", round(k0, 3), ", lambda =", round(lambda0, 3), "\n")
-cat("Treatment: k =", round(k1, 3), ", lambda =", round(lambda1, 3), "\n")
-
 # --- plotting ---
 ks_all <- data.frame(
   Control = c(
