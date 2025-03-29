@@ -145,30 +145,105 @@ fit_joint <- optim(
 k_joint <- exp(fit_joint$par[1:2])
 names(k_joint) <- c("Control", "Treatment")
 
+# --- optim() log-hazard model ---
+# --- optim() group-specific log-hazard model ---
+# Model:
+# if Control:    log h(t) = a0 + b0 * log t
+# if Treatment:  log h(t) = a1 + b1 * log t
+# 
+# recognize that 
+# group-specific log-hazard model:
+#   log h(t) = a_g + b_g * log(t)
+#
+# this is equivalent to the Weibull hazard:
+#   h(t) = (k / lambda) * (t / lambda)^(k - 1)
+#
+# taking logs:
+#   log h(t) = log(k) - log(lambda) + (k - 1) * log(t)
+#
+# match coefficients:
+#   b_g     = k_g - 1 --> k_g = b_g + 1
+#   a_g     = log(k_g) - log(lambda_g)
+#
+# solve for lambda_g:
+#   lambda_g = exp(log(k_g) - a_g)
+
+nll_loghaz_groups <- function(par) {
+  a0 <- par[1] # intercept for Control
+  b0 <- par[2] # slope for Control
+  a1 <- par[3] # intercept for Treatment
+  b1 <- par[4] # slope for Treatment
+  logt <- log(df$tte)
+  is_trt <- df$group == "Treatment"
+  a <- ifelse(is_trt, a1, a0)
+  b <- ifelse(is_trt, b1, b0)
+  eta <- a + b * logt
+  h <- exp(eta)
+  H <- exp(eta - b * logt) * df$tte^(b + 1) / (b + 1)
+  nll <- -sum(log(h) - H)
+  nll
+}
+
+init <- rep(0, 4)
+fit_loghaz_groups <- optim(init, nll_loghaz_groups, hessian = TRUE)
+
+# extract
+pars <- fit_loghaz_groups$par
+a0 <- pars[1]
+b0 <- pars[2]
+a1 <- pars[3]
+b1 <- pars[4]
+
+# recover Weibull k and lambda
+k0 <- b0 + 1
+lambda0 <- exp(log(k0) - a0)
+
+k1 <- b1 + 1
+lambda1 <- exp(log(k1) - a1)
+
+cat("Recovered from group-specific log-hazard model:\n")
+cat("Control:   k =", round(k0, 3), ", lambda =", round(lambda0, 3), "\n")
+cat("Treatment: k =", round(k1, 3), ", lambda =", round(lambda1, 3), "\n")
+
 # --- plotting ---
-par(mfrow = c(1, 1))
+ks_all <- data.frame(
+  Control = c(
+    params["Control", "est"],
+    k_ctrl, k_joint["Control"], k0, true_k["Control"]
+  ),
+  Treatment = c(
+    params["Treatment", "est"],
+    k_trt, k_joint["Treatment"], k1, true_k["Treatment"]
+  )
+)
+rownames(ks_all) <- c(
+  "survreg", "optim_sep",
+  "optim_joint", "loghaz_grp_optim", "truth"
+)
+par(mfrow=c(1,1))
 plot(NULL,
   xlim = c(0.75, 2.25), ylim = c(0.5, 2.4),
   xlab = "", ylab = "Shape (k)", xaxt = "n",
-  main = "Weibull Shape with 95% CI"
+  main = "Weibull Shape Parameter Estimates"
 )
-axis(1, at = 1:2, labels = rownames(params))
+axis(1, at = 1:2, labels = c("Control", "Treatment"))
 
-# 95% CI from survreg()
+# CI bars from survreg
 arrows(1:2, params[, "lower"], 1:2, params[, "upper"],
   angle = 90, code = 0, length = 0.1
 )
 
-# points
-points(1:2, params[, "est"], pch = 19, col = "blue") # survreg() separate
-points(1:2, true_k, pch = 4, col = "red", cex = 1.5) # truth
-points(1:2, c(k_ctrl, k_trt), pch = 17, col = "darkgreen") # optim() separate
-points(1:2, k_joint, pch = 15, col = "purple") # optim() joint
+# points for all models
+pch_vec <- c(19, 17, 15, 3, 4) # updated symbols
+col_vec <- c("blue", "darkgreen", "purple", "black", "red")
+
+for (i in 1:nrow(ks_all)) {
+  points(1:2, ks_all[i, ], pch = pch_vec[i], col = col_vec[i])
+}
 
 legend("topleft",
-  legend = c(
-    "survreg() separate", "Truth", "optim() separate",
-    "optim() joint"
-  ),
-  pch = c(19, 4, 17, 15), col = c("blue", "red", "darkgreen", "purple")
+  legend = rownames(ks_all),
+  pch = pch_vec,
+  col = col_vec,
+  title = "Estimator"
 )
