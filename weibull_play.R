@@ -145,7 +145,6 @@ fit_joint <- optim(
 k_joint <- exp(fit_joint$par[1:2])
 names(k_joint) <- c("Control", "Treatment")
 
-# --- optim() log-hazard model ---
 # --- optim() group-specific log-hazard model ---
 # Model:
 # if Control:    log h(t) = a0 + b0 * log t
