@@ -67,7 +67,7 @@ library(survival)
 
 # --- settings ---
 add_censoring <- FALSE # set to TRUE to deal with nightmare of censoring
-n_simulations <- 100 # number of simulations
+n_simulations <- 1000 # number of simulations
 n <- 20 # large sample size per simulation
 true_k <- 1.5 # true shape parameter
 true_lambda <- 2 # true scale parameter
