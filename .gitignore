@@ -4,3 +4,4 @@
 .Ruserdata
 *.Rproj
 AIC.R
+weibull_play.R
