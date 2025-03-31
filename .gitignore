@@ -5,3 +5,4 @@
 *.Rproj
 AIC.R
 weibull_play.R
+weibull_mean_cv.R
