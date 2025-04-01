@@ -4,6 +4,14 @@ author: "Chris Cahill"
 format: html
 ---
 
+## Description of files
+
+`weibull_play.R` shows some simple ways to simulate and estimate Weibull data
+
+`compare.R` shows relationships between accelerated failure time and log hazard parameterizations of the Weibull model
+
+`weibull_tutorial.qmd` render this file to generate a tutorial
+
 ## Introduction
 
 This document derives and implements the Weibull log-likelihood with optional right censoring. We walk through the probability density function (PDF), survival function S(t), cumulative hazard H(t), and the full log-likelihood step-by-step, with algebraic derivations and interpretation. We also demonstrate this with simulated data. Much of this document comes from the Weibull probability density function (see [https://en.wikipedia.org/wiki/Weibull_distribution](https://en.wikipedia.org/wiki/Weibull_distribution)) and the first 100 pages of Paul Allison's Survival Analysis using SAS book.
