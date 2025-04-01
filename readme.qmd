@@ -1,57 +1,36 @@
-# Parametric survival modeling with censoring via the Weibull
-distribution
-Chris Cahill
+---
+title: "Parametric survival modeling with censoring via the Weibull distribution"
+author: "Chris Cahill"
+format: gfm
+---
 
 ## Description of files
 
-`weibull_play.R` shows some simple ways to simulate and estimate Weibull
-data
+`weibull_play.R` shows some simple ways to simulate and estimate Weibull data
 
-`compare.R` shows relationships between accelerated failure time and log
-hazard parameterizations of the Weibull model
+`compare.R` shows relationships between accelerated failure time and log hazard parameterizations of the Weibull model
 
 `weibull_tutorial.qmd` render this file to generate a tutorial
 
 ## Introduction
 
-This document derives and implements the Weibull log-likelihood with
-optional right censoring. We walk through the probability density
-function (PDF), survival function S(t), cumulative hazard H(t), and the
-full log-likelihood step-by-step, with algebraic derivations and
-interpretation. We also demonstrate this with simulated data. Much of
-this document comes from the Weibull probability density function (see
-<https://en.wikipedia.org/wiki/Weibull_distribution>) and the first 100
-pages of Paul Allison’s Survival Analysis using SAS book.
+This document derives and implements the Weibull log-likelihood with optional right censoring. We walk through the probability density function (PDF), survival function S(t), cumulative hazard H(t), and the full log-likelihood step-by-step, with algebraic derivations and interpretation. We also demonstrate this with simulated data. Much of this document comes from the Weibull probability density function (see <https://en.wikipedia.org/wiki/Weibull_distribution>) and the first 100 pages of Paul Allison's Survival Analysis using SAS book.
 
 ## 1. Weibull Probability Density Function (PDF)
 
-The Weibull distribution can parameterized by shape $\boldsymbol{k}$ and
-scale $\boldsymbol{\lambda}$:
+The Weibull distribution can parameterized by shape $\boldsymbol{k}$ and scale $\boldsymbol{\lambda}$:
 
 $$
 \Large f(t) = \frac{k}{\lambda} \left(\frac{t}{\lambda}\right)^{k - 1} e^{-\left(\frac{t}{\lambda}\right)^k}
 $$
 
-Both $\boldsymbol{k}$ and $\boldsymbol{\lambda}$ must be \> 0 for the
-Weibull distribution. In terms of interpretation, $\boldsymbol{k}$ can
-be thought of as modulating the risk or hazard of an event happening
-through time while $\boldsymbol{\lambda}$ modulates the horizontal
-stretch of the distribution.
+Both $\boldsymbol{k}$ and $\boldsymbol{\lambda}$ must be \> 0 for the Weibull distribution. In terms of interpretation, $\boldsymbol{k}$ can be thought of as modulating the risk or hazard of an event happening through time while $\boldsymbol{\lambda}$ modulates the horizontal stretch of the distribution.
 
-For example, if $\boldsymbol{k}$ \< 1.0, some fish leave quickly while
-others linger. If $\boldsymbol{k}$ = 1.0, it means there is a constant
-hazard through time (i.e., this is an exponential model). If
-$\boldsymbol{k}$ \> 1.0, the hazard increases through time so fish are
-more likely to leave as time goes on. In this case, $\boldsymbol{k}$ can
-be thought of as describing the risk profile of fish.
+For example, if $\boldsymbol{k}$ \< 1.0, some fish leave quickly while others linger. If $\boldsymbol{k}$ = 1.0, it means there is a constant hazard through time (i.e., this is an exponential model). If $\boldsymbol{k}$ \> 1.0, the hazard increases through time so fish are more likely to leave as time goes on. In this case, $\boldsymbol{k}$ can be thought of as describing the risk profile of fish.
 
-For $\boldsymbol{\lambda}$, higher values mean fish tend to move or
-transition later, all other things being equal. It describes the timing
-of movement events.
+For $\boldsymbol{\lambda}$, higher values mean fish tend to move or transition later, all other things being equal. It describes the timing of movement events.
 
-We simulate a bunch of distributions below to visualize this, but first
-we’ll walk through some important math involving the Weibull
-distribution and derive a log-likelihood for censored data.
+We simulate a bunch of distributions below to visualize this, but first we'll walk through some important math involving the Weibull distribution and derive a log-likelihood for censored data.
 
 ## 2. Deriving the Cumulative Distribution Function (CDF)
 
@@ -93,19 +72,14 @@ $$
 
 Where:
 
-- $\boldsymbol{a = \log k - k \log \lambda}$
-- $\boldsymbol{b = k - 1}$
+-   $\boldsymbol{a = \log k - k \log \lambda}$
+-   $\boldsymbol{b = k - 1}$
 
 ## 6. Cumulative Hazard Function
 
-We need the cumulative hazard function H(t) because it captures the
-total risk of failure accumulated up to time t. This is important even
-for censored observations, since knowing that a critter survived up to a
-certain point still provides useful information about the underlying
-processes that we are interested in.
+We need the cumulative hazard function H(t) because it captures the total risk of failure accumulated up to time t. This is important even for censored observations, since knowing that a critter survived up to a certain point still provides useful information about the underlying processes that we are interested in.
 
-The cumulative hazard can be derived by taking the integral of the
-hazard function and in our case is:
+The cumulative hazard can be derived by taking the integral of the hazard function and in our case is:
 
 $$
 \Large H(t) = -\log S(t) = \left(\frac{t}{\lambda}\right)^k
@@ -119,8 +93,7 @@ $$
 
 ## 7. Log-Likelihood with Censoring
 
-Let $\boldsymbol{d_i = 1}$ if the event is observed, and 0 if censored.
-Then the likelihood for observation (i) is:
+Let $\boldsymbol{d_i = 1}$ if the event is observed, and 0 if censored. Then the likelihood for observation (i) is:
 
 $$
 \Large L_i = [f(t_i)]^{d_i} [S(t_i)]^{1 - d_i} = [h(t_i) S(t_i)]^{d_i} [S(t_i)]^{1 - d_i} = [h(t_i)]^{d_i} S(t_i)
@@ -134,18 +107,14 @@ $$
 
 ### Interpretation:
 
-- $\boldsymbol{\log h(t_i)}$: Only contributes when the event is
-  observed $\boldsymbol{d_i = 1}$. It reflects the **instantaneous
-  risk**.
-- $\boldsymbol{-H(t_i)}$: Always contributes. It reflects the
-  **probability of surviving** up to time $\boldsymbol{t_i}$.
+-   $\boldsymbol{\log h(t_i)}$: Only contributes when the event is observed $\boldsymbol{d_i = 1}$. It reflects the **instantaneous risk**.
+-   $\boldsymbol{-H(t_i)}$: Always contributes. It reflects the **probability of surviving** up to time $\boldsymbol{t_i}$.
 
-Together, they form the complete log-likelihood for censored survival
-data.
+Together, they form the complete log-likelihood for censored survival data.
 
 ## 9. Simulating Weibull Distributions
 
-``` r
+```{r echo = T, eval = T}
 # --- panel 1: varying shape, fixed scale ---
 set.seed(123)
 k_vals <- c(0.5, 1, 1.5, 2)
@@ -187,11 +156,7 @@ for (i in seq_along(k_vals)) {
   F <- 1 - exp(-(times / lambda_vals[i])^k_vals[i])
   lines(times, F, col = colors[i], lwd = 2)
 }
-```
 
-![](readme_files/figure-commonmark/unnamed-chunk-1-1.png)
-
-``` r
 # --- panel 2: varying scale, fixed shape ---
 lambda_vals2 <- c(0.5, 1, 2, 3)
 k_vals2 <- rep(1.5, length(lambda_vals2))
@@ -232,20 +197,16 @@ for (i in seq_along(lambda_vals2)) {
   F <- 1 - exp(-(times / lambda_vals2[i])^k_vals2[i])
   lines(times, F, col = colors2[i], lwd = 2)
 }
+
 ```
 
-![](readme_files/figure-commonmark/unnamed-chunk-1-2.png)
-
-This simulation visualizes how the Weibull distribution behaves under
-different shape values with a fixed scale. Shape $\boldsymbol{k < 1}$
-leads to decreasing hazard, $\boldsymbol{k = 1}$ gives constant hazard
-(exponential), and $\boldsymbol{k > 1}$ gives increasing hazard.
+This simulation visualizes how the Weibull distribution behaves under different shape values with a fixed scale. Shape $\boldsymbol{k < 1}$ leads to decreasing hazard, $\boldsymbol{k = 1}$ gives constant hazard (exponential), and $\boldsymbol{k > 1}$ gives increasing hazard.
 
 ## 8. R Implementation (Log-Likelihood Function)
 
 This is an implementation I built for use with e.g., `optim()`:
 
-``` r
+```{r echo = T}
 nll <- function(par, t, d) {
   k <- exp(par[1])
   lambda <- exp(par[2])
@@ -260,18 +221,12 @@ nll <- function(par, t, d) {
 }
 ```
 
-This then represents a numerical computing problem and parameters can be
-estimated using maximum likelihood or Bayesian methods (e.g., see
-Pawitawn 2013; Gelman et al. 2025). You can see how to call this model
-in the `compare.R` script (note that the relevant function is called
-`nll_loghaz_shape_scale`).
+This then represents a numerical computing problem and parameters can be estimated using maximum likelihood or Bayesian methods (e.g., see Pawitawn 2013; Gelman et al. 2025). You can see how to call this model in the `compare.R` script (note that the relevant function is called `nll_loghaz_shape_scale`).
 
 ## References
 
-Paul Allison. Survival Analysis Using SAS: A Practical Guide. 2nd
-Edition.
+Paul Allison. Survival Analysis Using SAS: A Practical Guide. 2nd Edition.
 
-Gelman et al. 2025. Bayesian Data Analysis. 3rd Edition.
+Gelman et al. 2025. Bayesian Data Analysis. 3rd Edition.
 
-Yudi Pawitan. In All Likelihood: Statistical Modelling and Inference
-Using Likelihood.
+Yudi Pawitan. In All Likelihood: Statistical Modelling and Inference Using Likelihood.
