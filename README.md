@@ -251,8 +251,7 @@ nll <- function(par, t, d) {
   lambda <- exp(par[2])
   a <- log(k) - k * log(lambda)
   b <- k - 1
-  logt <- log(t)
-  eta <- a + b * logt
+  eta <- a + b * log(t)
   h <- exp(eta)                                 # hazard function h(tᵢ)
   H <- exp(a) * t^(b + 1) / (b + 1)             # cumulative hazard H(tᵢ)
   ll <- d * log(h) - H                          # full log-likelihood
