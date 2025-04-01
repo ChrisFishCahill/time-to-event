@@ -1,5 +1,5 @@
-# Parametric survival modeling with censoring via the Weibull
-distribution
+# Parametric survival modeling with censoring via the Weibull distribution
+
 Chris Cahill
 
 ## Description of files
