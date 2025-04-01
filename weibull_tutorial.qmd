@@ -198,7 +198,7 @@ This simulation visualizes how the Weibull distribution behaves under different 
 This is an implementation I built for use with e.g., `optim()`:
 
 ```{r echo = T}
-nll_loghaz_shape_scale <- function(par, t, d) {
+nll <- function(par, t, d) {
   k <- exp(par[1])
   lambda <- exp(par[2])
   a <- log(k) - k * log(lambda)
@@ -212,9 +212,9 @@ nll_loghaz_shape_scale <- function(par, t, d) {
 }
 ```
 
-This then represents an numerical computing problem and maximum likelihood or Bayesian methods can be used to estimate parameters and conduct inference (e.g., see Pawitawn 2013; Gelman et al. 2025).  You can see how I call this model in the `compare.R` script.
+This then represents a numerical computing problem and parameters can be estimated using maximum likelihood or Bayesian methods (e.g., see Pawitawn 2013; Gelman et al. 2025).  You can see how to call this model in the `compare.R` script (note that the relevant function is called `nll_loghaz_shape_scale`).
 
-## Citations
+## References
 
 Paul Allison.  Survival Analysis Using SAS: A Practical Guide. 2nd Edition.
 
