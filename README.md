@@ -1,5 +1,7 @@
-# Parametric survival modeling with censoring via the Weibull
-distribution
+
+
+# Parametric survival modeling with censoring via the Weibull distribution
+
 Chris Cahill
 
 ## Description of files
@@ -143,7 +145,7 @@ $$
 Together, they form the complete log-likelihood for censored survival
 data.
 
-## 9. Simulating Weibull Distributions
+## 8. Simulating Weibull Distributions
 
 ``` r
 # --- panel 1: varying shape, fixed scale ---
@@ -241,7 +243,7 @@ different shape values with a fixed scale. Shape $\boldsymbol{k < 1}$
 leads to decreasing hazard, $\boldsymbol{k = 1}$ gives constant hazard
 (exponential), and $\boldsymbol{k > 1}$ gives increasing hazard.
 
-## 8. R Implementation (Log-Likelihood Function)
+## 9. R Implementation (Log-Likelihood Function)
 
 This is an implementation I built for use with e.g., `optim()`:
 
@@ -251,8 +253,7 @@ nll <- function(par, t, d) {
   lambda <- exp(par[2])
   a <- log(k) - k * log(lambda)
   b <- k - 1
-  logt <- log(t)
-  eta <- a + b * logt
+  eta <- a + b * log(t)
   h <- exp(eta)                                 # hazard function h(tᵢ)
   H <- exp(a) * t^(b + 1) / (b + 1)             # cumulative hazard H(tᵢ)
   ll <- d * log(h) - H                          # full log-likelihood
