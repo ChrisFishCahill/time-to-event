@@ -1,7 +1,9 @@
 ---
 title: "Parametric survival modeling with censoring via the Weibull distribution"
 author: "Chris Cahill"
-format: gfm
+format: 
+  gfm:
+    fig-dpi: 300
 ---
 
 ## Description of files
